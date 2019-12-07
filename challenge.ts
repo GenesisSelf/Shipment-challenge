@@ -25,7 +25,6 @@ class ShipmentSearchIndex {
     }
 }
 
-// TODO abstract this away. Not currently abstracting due to not able to modify above code.
 // Implementation needed
 interface ShipmentUpdateListenerInterface {
     receiveUpdate(id: string, shipmentData: any): any
@@ -67,5 +66,3 @@ export class UpdateOfShipment implements ShipmentUpdateListenerInterface {
         }
     }
 }
-
-//  TODO tests

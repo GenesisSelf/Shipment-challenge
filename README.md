@@ -18,3 +18,10 @@ Write the code according to the description in the gist
 
 - We aim to test your programming and analytic skills. Please DO NOT use external libraries.
 - Please DO NOT create pull requests. Just follow the guidelines and send us the bundle.
+
+## Candidate Notes
+
+- `index.js` was used for testing purposes.
+- TODO: tests
+- Nice to haves: ability to export and add spacing on original code for readability.
+- Thank you for inviting me to do this challenge.
