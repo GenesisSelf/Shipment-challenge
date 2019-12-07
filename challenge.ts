@@ -29,54 +29,49 @@ class ShipmentSearchIndex {
 // Implementation needed
 interface ShipmentUpdateListenerInterface {
     receiveUpdate(id: string, shipmentData: any): any
-    updateResource: string[] // resource can be queue, REST
 }
 class UpdateOfShipment implements ShipmentUpdateListenerInterface {
-    updateResource: string[]
+    updatesInProcessQueue: string[]
+    updatesToStoreQueue: string[]
+    searchIndex: any
 
-    constructor (updateResource: string[]) {
-        this.updateResource = [];
+    constructor () {
+        this.updatesInProcessQueue = []
+        this.searchIndex = new ShipmentSearchIndex()
+        this.updatesToStoreQueue = []
     }
 
     async receiveUpdate (id: string, shipmentData: any): Promise<any> {
-        const updateAlreadyExists = this.updateResource.includes(id)
+        const updateAlreadyExists = this.updatesInProcessQueue.includes(id)
 
         if (updateAlreadyExists) {
-            return console.log(`update with id of ${id} already exists`)
-        }
-        this.updateResource.push(id)
+            const firstInstanceOfId = this.updatesInProcessQueue[id].shift()
 
-        return this.processUpdate(this.updateResource, id, shipmentData)
+            this.storeUpdateQueue(firstInstanceOfId, shipmentData)
+            console.log(`update with id of ${id} already exists`)
+        }
+        this.updatesInProcessQueue.push(id)
+
+        return this.storeUpdateQueue(id, shipmentData)
     }
 
-    async processUpdate(resource: string[], id: string, shipmentData: string): Promise<any> {
+    async storeUpdateQueue(id: string, shipmentData: any) {
         try {
-            const request = new ShipmentSearchIndex()
-            const update = await request.updateShipment(id, shipmentData)
-            this.checkIdempotency(this.updateResource, id)
+            const update = await this.searchIndex.updateShipment(id, shipmentData)
 
             return console.log(`shipment updated successfully`, { id, ...update, shipmentData })
         } catch (e) {
             throw console.error(`failed to update`, e.stack)
         }
     }
-
-    checkIdempotency(resource: string[], id: string) {
-        resource.filter(idn => idn !== id)
-
-        return this.updateResource
-    }
 }
 
 async function handler() {
-    const request = new UpdateOfShipment([])
-
     try {
-        await request.receiveUpdate('124', ["meow"])
+        await searchIndex.receiveUpdate('124', ["meow"])
     } catch (e) {
         console.error(e)
     }
-
 }
 
 //  TODO tests
