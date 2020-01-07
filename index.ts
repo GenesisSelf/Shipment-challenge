@@ -1,4 +1,4 @@
-import { UpdateOfShipment } from './challenge'
+// import { UpdateOfShipment } from './challenge'
 
 // handler for testing purposes only with dummy data
 async function handler(id: string, shipmentData: string[]) {

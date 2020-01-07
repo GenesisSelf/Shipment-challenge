@@ -23,5 +23,3 @@ Write the code according to the description in the gist
 
 - `index.js` was used for testing purposes.
 - TODO: tests
-- Nice to haves: ability to export and add spacing on original code for readability.
-- Thank you for inviting me to do this challenge.

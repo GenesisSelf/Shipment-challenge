@@ -29,40 +29,35 @@ class ShipmentSearchIndex {
 interface ShipmentUpdateListenerInterface {
     receiveUpdate(id: string, shipmentData: any): any
 }
-export class UpdateOfShipment implements ShipmentUpdateListenerInterface {
-    updatesInProcessQueue: string[]
-    updatesOfShipmentQueue: string[]
+
+interface Shipment {
+    id: string
+    data: any
+}
+
+class UpdateOfShipment implements ShipmentUpdateListenerInterface {
+    updatesInProcessQueue: Shipment[]
     searchIndex: any
 
     constructor () {
         this.updatesInProcessQueue = []
         this.searchIndex = new ShipmentSearchIndex()
-        this.updatesOfShipmentQueue = []
+        this.startShipmentProcessor()
     }
 
     async receiveUpdate (id: string, shipmentData: any): Promise<any> {
-        const updateAlreadyExists = this.updatesInProcessQueue.includes(id)
-
-        if (updateAlreadyExists) {
-            this.updatesInProcessQueue.find(id => {
-                this.storeUpdateQueue(id, shipmentData)
-            })
-
-            return console.log(`update with id of ${id} already exists`)
-        }
-        this.updatesInProcessQueue.push(id)
-
-        return this.storeUpdateQueue(id, shipmentData)
+        this.updatesInProcessQueue.push({ id, data: shipmentData })
     }
-
-    async storeUpdateQueue(id: string, shipmentData: any) {
-        try {
-            const update = await this.searchIndex.updateShipment(id, shipmentData)
-            this.updatesInProcessQueue.shift()
-
-            return console.log(`shipment updated successfully`, { id, ...update, shipmentData })
-        } catch (e) {
-            throw console.error(`failed to update`, e.stack)
+    
+    async startShipmentProcessor() {
+        while (true) {
+            const shipment = this.updatesInProcessQueue.shift()
+            if (!shipment) {
+                await sleep(200)
+                continue
+            }
+            const { id, data } = shipment
+            await this.searchIndex.updateShipment(id, data)
         }
     }
 }
